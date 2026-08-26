@@ -4,7 +4,11 @@ import os
 import pandas as pd 
 from io import BytesIO
 
-dotenv.load_dotenv()
+from pathlib import Path
+
+# Garante que o .env seja encontrado independente de onde o notebook está rodando
+caminho_env = Path(__file__).parent.parent.parent / '.env'
+dotenv.load_dotenv(caminho_env)
 
 # Criando a cessão 
 
