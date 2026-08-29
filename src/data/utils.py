@@ -28,189 +28,43 @@ def iniciar_cessao_aws():
 
 
 
-
-#-- carregar parquet por camada do s3
 def carregar_parquet_s3(
     s3_client,
     bucket: str,
-    ano: int,
     nome_tabela: str,
-    camada: str = "bronze",
+    camada: str = "gold",
+    ano: str | int = None,
+    subpasta: str = None,
     ler_dicionario: bool = False,
 ) -> pd.DataFrame:
     """
-    Carrega um arquivo Parquet do S3.
-
-    Estrutura esperada:
-
-    bronze/
-        ano=2025/
-            dados/
-                TS_ALUNO.parquet
-
-    ou
-
-    bronze/
-        ano=2025/
-            dicionario/
-                dicionario_TS_ALUNO.parquet
+    Carrega qualquer arquivo Parquet do S3 de forma flexível.
+    
+    Exemplos de chaves geradas:
+    - Com ano:        'gold/ano=historico/dados/TS_ALUNO.parquet'
+    - Dados externos: 'gold/dados_externos/fact_escola.parquet'
+    - Fato 2026:      'gold/fato/ano=2026/dados/FATO_ALFABETIZACAO.parquet'
     """
-
-    pasta = "dicionario" if ler_dicionario else "dados"
-
-    arquivo = (
-        f"dicionario_{nome_tabela}.parquet"
-        if ler_dicionario
-        else f"{nome_tabela}.parquet"
-    )
-
-    chave = f"{camada}/ano={ano}/{pasta}/{arquivo}"
+    nome_arquivo = f"dicionario_{nome_tabela}.parquet" if ler_dicionario else f"{nome_tabela}.parquet"
+    
+    # Montagem dinâmica da chave no S3
+    if subpasta:
+        # Se você passar uma subpasta direta (ex: 'dados_externos' ou 'fato/ano=2026/dados')
+        chave = f"{camada}/{subpasta}/{nome_arquivo}"
+    elif ano is not None:
+        # Padrão com partição de ano
+        pasta_interna = "dicionario" if ler_dicionario else "dados"
+        chave = f"{camada}/ano={ano}/{pasta_interna}/{nome_arquivo}"
+    else:
+        # Padrão direto na camada
+        chave = f"{camada}/{nome_arquivo}"
 
     print(f"Lendo: s3://{bucket}/{chave}")
 
     try:
-
-        obj = s3_client.get_object(
-            Bucket=bucket,
-            Key=chave
-        )
-
-        return pd.read_parquet(
-            BytesIO(obj["Body"].read())
-        )
-
+        obj = s3_client.get_object(Bucket=bucket, Key=chave)
+        return pd.read_parquet(BytesIO(obj["Body"].read()))
     except s3_client.exceptions.NoSuchKey:
-        raise FileNotFoundError(
-            f"Arquivo não encontrado:\n"
-            f"s3://{bucket}/{chave}"
-        )
-
+        raise FileNotFoundError(f"Arquivo não encontrado:\ns3://{bucket}/{chave}")
     except Exception as e:
-        raise RuntimeError(
-            f"Erro ao ler {chave} do bucket {bucket}.\n{e}"
-        )
-
-
-
-def ler_dados_externos(
-    s3_client,
-    bucket: str,
-    nome_tabela: str,
-    pasta:str = 'dados_externos',
-    camada: str = "bronze",
-    ler_dicionario: bool = False,
-) -> pd.DataFrame:
-    """
-    Carrega um arquivo Parquet do S3.
-
-    Estrutura esperada:
-
-    bronze/
-        ano=2025/
-            dados/
-                TS_ALUNO.parquet
-
-    ou
-
-    bronze/
-        ano=2025/
-            dicionario/
-                dicionario_TS_ALUNO.parquet
-    """
-
-
-    arquivo = (
-        f"dicionario_{nome_tabela}.parquet"
-        if ler_dicionario
-        else f"{nome_tabela}.parquet"
-    )
-
-    chave = f"{camada}/{pasta}/{arquivo}"
-
-    print(f"Lendo: s3://{bucket}/{chave}")
-
-    try:
-
-        obj = s3_client.get_object(
-            Bucket=bucket,
-            Key=chave
-        )
-
-        return pd.read_parquet(
-            BytesIO(obj["Body"].read())
-        )
-
-    except s3_client.exceptions.NoSuchKey:
-        raise FileNotFoundError(
-            f"Arquivo não encontrado:\n"
-            f"s3://{bucket}/{chave}"
-        )
-
-    except Exception as e:
-        raise RuntimeError(
-            f"Erro ao ler {chave} do bucket {bucket}.\n{e}"
-        )
-
-
-
-
-
-def ler_fato_s3(
-    s3_client,
-    bucket: str,
-    ano: int,
-    nome_tabela: str,
-    camada: str = "bronze",
-    ler_dicionario: bool = False,
-) -> pd.DataFrame:
-    """
-    Carrega um arquivo Parquet do S3.
-
-    Estrutura esperada:
-
-    bronze/
-        ano=2025/
-            dados/
-                TS_ALUNO.parquet
-
-    ou
-
-    bronze/
-        ano=2025/
-            dicionario/
-                dicionario_TS_ALUNO.parquet
-    """
-
-    pasta = "dicionario" if ler_dicionario else "dados"
-
-    arquivo = (
-        f"dicionario_{nome_tabela}.parquet"
-        if ler_dicionario
-        else f"{nome_tabela}.parquet"
-    )
-
-    chave = f"{camada}/fato/ano=2026/dados/{arquivo}"
-
-    print(f"Lendo: s3://{bucket}/{chave}")
-
-    try:
-
-        obj = s3_client.get_object(
-            Bucket=bucket,
-            Key=chave
-        )
-
-        return pd.read_parquet(
-            BytesIO(obj["Body"].read())
-        )
-
-    except s3_client.exceptions.NoSuchKey:
-        raise FileNotFoundError(
-            f"Arquivo não encontrado:\n"
-            f"s3://{bucket}/{chave}"
-        )
-
-    except Exception as e:
-        raise RuntimeError(
-            f"Erro ao ler {chave} do bucket {bucket}.\n{e}"
-        )
+        raise RuntimeError(f"Erro ao ler {chave} do bucket {bucket}.\n{e}")
