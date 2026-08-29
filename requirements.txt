@@ -10,4 +10,4 @@ scikit-learn
 numpy
 pyarrow
 matplotlib
-
+seaborn
