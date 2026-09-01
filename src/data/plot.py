@@ -178,3 +178,50 @@ def gerar_barplot_medias(df: pd.DataFrame, x: str, y: str, top_n: int = None, sa
         salvar_fig(fig, f"bar_media_{y}_por_{x}.png")
         
     plt.show()
+
+
+def gerar_matriz_correlacao(df: pd.DataFrame, colunas: list = None, salvar: bool = True):
+    """
+    Gera um Heatmap de correlação para as colunas numéricas especificadas.
+    """
+    # Se não passar colunas, pega todas as numéricas (removendo colunas que contenham ID ou CO)
+    if colunas is None:
+        colunas = [
+            c for c in df.select_dtypes(include=[np.number]).columns
+            if not any(id_term in c for id_term in ['ID_', 'CO_', 'CADERNO', 'BLOCO'])
+        ]
+    else:
+        colunas = [c for c in colunas if c in df.columns]
+
+    corr = df[colunas].corr()
+    mask = np.triu(np.ones_like(corr, dtype=bool))
+
+    # Nomes amigáveis nos eixos
+    nomes_formatados = [dicionario_colunas.get(c, c) for c in colunas]
+
+    fig, ax = plt.subplots(figsize=(11, 9))
+    sns.heatmap(
+        corr,
+        mask=mask,
+        cmap="coolwarm",
+        vmax=1.0,
+        vmin=-1.0,
+        center=0,
+        annot=True,
+        fmt=".2f",
+        square=True,
+        linewidths=0.5,
+        xticklabels=nomes_formatados,
+        yticklabels=nomes_formatados,
+        cbar_kws={"shrink": 0.75},
+        ax=ax
+    )
+
+    ax.set_title("Matriz de Correlação das Variáveis", fontsize=14, weight="bold", pad=15)
+    plt.xticks(rotation=45, ha="right")
+    plt.yticks(rotation=0)
+
+    if salvar:
+        salvar_fig(fig, "matriz_correlacao.png")
+
+    plt.show()
