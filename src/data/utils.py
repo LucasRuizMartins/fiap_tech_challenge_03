@@ -68,3 +68,6 @@ def carregar_parquet_s3(
         raise FileNotFoundError(f"Arquivo não encontrado:\ns3://{bucket}/{chave}")
     except Exception as e:
         raise RuntimeError(f"Erro ao ler {chave} do bucket {bucket}.\n{e}")
+
+
+
