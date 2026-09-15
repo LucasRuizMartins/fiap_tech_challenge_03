@@ -1,8 +1,8 @@
 tech_challenge_03
 ==============================
 
-[Video de apresentação](https://docs.google.com/videos/u/0/d/1iJ1wNroL6RKNjG-Z4AqEarHvlPy2PBTSFOYR_Ic26-Y/play?usp=chrome_extension_sharing)
-[PDF da apresentação](https://docs.google.com/presentation/d/1lVsukVksM9MWq8dIc1N_nfXhg2AwJ0dvEajGFXvfRxw/edit?usp=sharing) [2](https://docs.google.com/presentation/d/1lVsukVksM9MWq8dIc1N_nfXhg2AwJ0dvEajGFXvfRxw/edit?slide=id.g3fb576cc7a4_36_0#slide=id.g3fb576cc7a4_36_0)
+[Video de apresentação](https://docs.google.com/videos/u/0/d/1iJ1wNroL6RKNjG-Z4AqEarHvlPy2PBTSFOYR_Ic26-Y/play?usp=chrome_extension_sharing) <br>
+[PDF da apresentação](https://docs.google.com/presentation/d/1lVsukVksM9MWq8dIc1N_nfXhg2AwJ0dvEajGFXvfRxw/edit?usp=sharing) <br> [Link 2](https://docs.google.com/presentation/d/1lVsukVksM9MWq8dIc1N_nfXhg2AwJ0dvEajGFXvfRxw/edit?slide=id.g3fb576cc7a4_36_0#slide=id.g3fb576cc7a4_36_0)
 
 
 project 3 fiap
